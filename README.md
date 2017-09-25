@@ -1,37 +1,132 @@
-## Welcome to GitHub Pages
+<!DOCTYPE html>
+<html>
 
-You can use the [editor on GitHub](https://github.com/chrissno/Web-Map/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+<head>
+    <meta charset=utf-8 />
+    <title>Lab 08 Starter</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
 
-### Markdown
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: Lato, sans-serif;
+            color: '#c4d1d5';
+            background-image: url(https://github.com/chrissno/Web-Map/blob/master/background.jpg)
+        }
+        header {
+            padding: 6px 10%;
+        }
+        h1 {
+            display: inline-block;
+            margin-right: 20px;
+            color: '#0D0000';
+        }
+        h2 {
+            display: inline-block;
+            color: '#0D0000';
+        }
+        #map {
+            width: 80%;
+            height: 540px;
+            margin: 10px auto;
+        }
+        footer {
+            padding: 6px 10%;
+            width: 80%;
+        }
+        p {
+            font-size: 1em;
+            color: '#0D0000';
+        }
+    </style>
+</head>
 
-```markdown
-Syntax highlighted code block
+<body>
+    <header>
+        <h1>The Amount of Energy Being Produced By Power Plants</h1>
+        <h2>Power from Solar Only</h2>
+    </header>
 
-# Header 1
-## Header 2
-### Header 3
+    <div id='map'></div>
 
-- Bulleted
-- List
+    <footer>
+        <p>Map authored by Christopher Snowadzky</p>
+        <p></p>
+    </footer>
 
-1. Numbered
-2. List
+    <script src="power-plants.js"></script>
+    <script>
 
-**Bold** and _Italic_ and `Code` text
+      var map = L.map('map', {
+          center: [36,-94],
+          zoom: 4,
+      });
+      
+      var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+          subdomains: 'abcd',
+          maxZoom: 19
+      });  
+      
+      tiles.addTo(map);
+   
+    plants.features.sort(function(a, b) {
+    return b.properties.capacity_mw - a.properties.capacity_mw;
+});
 
-[Link](url) and ![Image](src)
-```
+          
+    L.geoJson(plants, {
+    pointToLayer: function(feature,latlng) {
+        return L.circleMarker(latlng, {
+            color: 'white',
+            weight: 1,
+            fillColor: '#CE6237',
+            fillOpacity: .8,
+            radius: getRadius(feature.properties.capacity_mw)
+        });   
+    },
+        filter: function(feature, layer) {
+            if(feature.properties.fuel_source.Solar){
+                return feature;
+            }    
+                },
+onEachFeature : function(feature,layer) {
+        layer.on('mouseover', function() {
+    layer.setStyle({
+        fillColor: '#42A575'
+    });
+});
+layer.on('mouseout', function() {
+    layer.setStyle({
+        fillColor: '#CE6237'
+    });
+});
+var wat = feature.properties.capacity_mw
+var pop= "<b>" + feature.properties.plant_name+ "</b><br>" +
+               wat.toLocaleString() + " MW"
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+layer.bindPopup(pop);
+    }
 
-### Jekyll Themes
+ 
+}).addTo(map);
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/chrissno/Web-Map/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+        
+function getRadius(area) {
+    var radius = Math.sqrt(area/Math.PI);
+    return radius * .6;  
+}
 
-### Support or Contact
+        
+    </script>
+    
+</body>
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+</html>
